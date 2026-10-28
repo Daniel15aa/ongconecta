@@ -1,129 +1,234 @@
-const $ = (seletor) => document.querySelector(seletor);
-const filtro = { area: '', q: '' };
-let ongs = [];
+const ongsData = [
+  {
+    id: 1,
+    nome: "Rio Limpo Joinville",
+    categoria: "Meio Ambiente",
+    bairro: "Pirabeiraba",
+    vagas: 10,
+    descricao: "Mutirões mensais de limpeza das margens do Rio Cachoeira e plantio de mudas nativas."
+  },
+  {
+    id: 2,
+    nome: "Mãos que Acolhem",
+    categoria: "Assistência Social",
+    bairro: "Centro",
+    vagas: 8,
+    descricao: "Preparo e distribuição de refeições para pessoas em situação de rua e apoio com agasalhos."
+  },
+  {
+    id: 3,
+    nome: "Ler para Crescer",
+    categoria: "Educação",
+    bairro: "Boa Vista",
+    vagas: 6,
+    descricao: "Reforço escolar e rodas de leitura para crianças do ensino fundamental, aos sábados de manhã."
+  },
+  {
+    id: 4,
+    nome: "Saúde em Ação",
+    categoria: "Saúde",
+    bairro: "Vila Nova",
+    vagas: 5,
+    descricao: "Acompanhamento preventivo de saúde e caminhadas orientadas para a terceira idade."
+  },
+  {
+    id: 5,
+    nome: "Patas na Rua",
+    categoria: "Animais",
+    bairro: "Costa e Silva",
+    vagas: 4,
+    descricao: "Resgate, castração e adoção responsável de cães e gatos. Precisa de apoio em feiras de adoção."
+  },
+  {
+    id: 6,
+    nome: "Sinfonia Comunitária",
+    categoria: "Cultura",
+    bairro: "Aventureiro",
+    vagas: 3,
+    descricao: "Aulas gratuitas de música e instrumentos de corda para jovens da rede pública."
+  }
+];
 
-async function api(url, opcoes) {
-  const resposta = await fetch(url, opcoes);
-  const corpo = await resposta.json();
-  if (!resposta.ok) throw Object.assign(new Error('Falha na requisição'), { corpo });
-  return corpo;
+let selectedCategory = "Todas";
+
+// Elementos do DOM
+const ongListContainer = document.getElementById("ong-list");
+const searchInput = document.getElementById("search-input");
+const filterModal = document.getElementById("filter-modal");
+const profileModal = document.getElementById("profile-modal");
+const applyModal = document.getElementById("apply-modal");
+const successModal = document.getElementById("success-modal");
+
+const openFilterBtn = document.getElementById("open-filter-btn");
+const openFilterModalBtn = document.getElementById("open-filter-modal-btn");
+const closeModalBtn = document.getElementById("close-modal-btn");
+const applyFilterBtn = document.getElementById("apply-filter-btn");
+
+const openProfileBtn = document.getElementById("open-profile-btn");
+const closeProfileBtn = document.getElementById("close-profile-btn");
+const closeProfileAC = document.getElementById("close-profile-action");
+
+const closeApplyBtn = document.getElementById("close-apply-btn");
+const applyForm = document.getElementById("apply-form");
+const finishSuccessBtn = document.getElementById("finish-success-btn");
+
+const serviceTitle = document.getElementById("service-title");
+const serviceLocation = document.getElementById("service-location");
+const serviceDescription = document.getElementById("service-description");
+
+const categoryButtons = document.querySelectorAll(".category-btn");
+const activeFilterBadge = document.getElementById("active-filter-badge");
+const activeFilterName = document.getElementById("active-filter-name");
+const clearFilterBtn = document.getElementById("clear-filter-btn");
+const sortSelect = document.getElementById("sort-select");
+
+const totalVagasSpan = document.getElementById("total-vagas");
+const totalOrgsSpan = document.getElementById("total-orgs");
+
+function updateStats(filteredList) {
+  if (totalOrgsSpan) totalOrgsSpan.textContent = filteredList.length;
+  if (totalVagasSpan) {
+    const totalVagas = filteredList.reduce((acc, curr) => acc + curr.vagas, 0);
+    totalVagasSpan.textContent = totalVagas;
+  }
 }
 
-function criar(tag, atributos = {}, texto = '') {
-  const el = document.createElement(tag);
-  Object.assign(el, atributos);
-  if (texto) el.textContent = texto;
-  return el;
-}
+function renderONGS() {
+  if (!ongListContainer) return;
 
-function renderizarLista(itens) {
-  const lista = $('#lista');
-  lista.replaceChildren();
+  const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : "";
+  const sortType = sortSelect ? sortSelect.value : "mais-vagas";
 
-  if (itens.length === 0) {
-    lista.append(criar('li', { className: 'vazio' }, 'Nenhuma organização encontrada para esse filtro.'));
+  let filteredONGS = ongsData.filter(ong => {
+    const matchesCategory = (selectedCategory === "Todas" || ong.categoria === selectedCategory);
+    const matchesSearch = ong.nome.toLowerCase().includes(searchTerm) || 
+                          ong.categoria.toLowerCase().includes(searchTerm) ||
+                          ong.descricao.toLowerCase().includes(searchTerm) ||
+                          ong.bairro.toLowerCase().includes(searchTerm);
+    return matchesCategory && matchesSearch;
+  });
+
+  if (sortType === "mais-vagas") {
+    filteredONGS.sort((a, b) => b.vagas - a.vagas);
+  } else if (sortType === "alfabetica") {
+    filteredONGS.sort((a, b) => a.nome.localeCompare(b.nome));
+  }
+
+  updateStats(filteredONGS);
+
+  if (filteredONGS.length === 0) {
+    ongListContainer.innerHTML = `
+      <div style="text-align: center; padding: 3rem 1rem; color: #64748b;">
+        <p style="font-size: 1.1rem; font-weight: 600;">Nenhuma organização encontrada.</p>
+        <p style="font-size: 0.9rem;">Tente pesquisar por outro termo ou alterar os filtros.</p>
+      </div>
+    `;
     return;
   }
 
-  for (const ong of itens) {
-    const li = criar('li', { className: 'ong' });
-
-    const titulo = criar('div');
-    titulo.append(criar('h3', {}, ong.nome), criar('p', { className: 'meta' }, `${ong.area} · ${ong.bairro}`));
-
-    const acao = criar('div', { className: 'acao' });
-    const botao = criar('button', { className: 'link', type: 'button' }, 'Quero ajudar');
-    botao.addEventListener('click', () => escolherOng(ong.id));
-    acao.append(criar('span', { className: 'vagas' }, `${ong.vagas} ${ong.vagas === 1 ? 'vaga' : 'vagas'}`), botao);
-
-    li.append(titulo, criar('p', {}, ong.descricao), acao);
-    lista.append(li);
-  }
+  ongListContainer.innerHTML = filteredONGS.map(ong => `
+    <div class="card-ong">
+      <div class="card-header">
+        <div>
+          <h3>${ong.nome}</h3>
+          <span class="ong-meta">${ong.categoria} • ${ong.bairro}</span>
+        </div>
+        <span class="vagas-badge">${ong.vagas} vagas abertas</span>
+      </div>
+      <p class="ong-description">${ong.descricao}</p>
+      <div class="card-footer">
+        <button type="button" class="btn-primary btn-quero-ajudar" data-id="${ong.id}">Quero ajudar</button>
+      </div>
+    </div>
+  `).join("");
 }
 
-function renderizarAreas(areas) {
-  const container = $('#areas');
-  for (const area of ['', ...areas]) {
-    const botao = criar('button', { type: 'button' }, area || 'Todas');
-    botao.setAttribute('aria-pressed', String(area === filtro.area));
-    botao.addEventListener('click', () => {
-      filtro.area = area;
-      container.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b === botao)));
-      carregar();
-    });
-    container.append(botao);
-  }
-}
-
-function escolherOng(id) {
-  $('#form [name="ongId"]').value = String(id);
-  $('#inscricao').scrollIntoView();
-  $('#form [name="nome"]').focus({ preventScroll: true });
-}
-
-async function carregar() {
-  const params = new URLSearchParams();
-  if (filtro.area) params.set('area', filtro.area);
-  if (filtro.q) params.set('q', filtro.q);
-  renderizarLista(await api(`/api/ongs?${params}`));
-}
-
-async function iniciar() {
-  const [todas, areas] = await Promise.all([api('/api/ongs'), api('/api/areas')]);
-  ongs = todas;
-
-  $('#num-ongs').textContent = todas.length;
-  $('#num-vagas').textContent = todas.reduce((soma, o) => soma + o.vagas, 0);
-  $('#num-areas').textContent = areas.length;
-
-  const select = $('#form [name="ongId"]');
-  select.append(criar('option', { value: '' }, 'Selecione…'));
-  for (const ong of todas) select.append(criar('option', { value: ong.id }, ong.nome));
-
-  renderizarAreas(areas);
-  renderizarLista(todas);
-}
-
-let espera;
-$('#busca').addEventListener('input', (evento) => {
-  clearTimeout(espera);
-  espera = setTimeout(() => { filtro.q = evento.target.value.trim(); carregar(); }, 250);
-});
-
-$('#form').addEventListener('submit', async (evento) => {
-  evento.preventDefault();
-  const form = evento.target;
-  const botao = form.querySelector('button');
-  const retorno = $('#retorno');
-
-  form.querySelectorAll('[data-erro]').forEach((el) => { el.textContent = ''; });
-  retorno.textContent = '';
-  botao.disabled = true;
-
-  try {
-    const dados = Object.fromEntries(new FormData(form));
-    const resultado = await api('/api/inscricoes', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(dados),
-    });
-    retorno.textContent = `Inscrição enviada para ${resultado.organizacao}. Obrigado por se voluntariar.`;
-    form.reset();
-  } catch (erro) {
-    const erros = erro.corpo && erro.corpo.erros;
-    if (erros) {
-      for (const [campo, mensagem] of Object.entries(erros)) {
-        const alvo = form.querySelector(`[data-erro="${campo}"]`);
-        if (alvo) alvo.textContent = mensagem;
+// Escutador Global na Lista (Event Delegation) - FUNCIONA SEMPRE
+if (ongListContainer) {
+  ongListContainer.addEventListener("click", (e) => {
+    const button = e.target.closest(".btn-quero-ajudar");
+    if (button) {
+      const ongId = parseInt(button.getAttribute("data-id"));
+      const ong = ongsData.find(o => o.id === ongId);
+      
+      if (ong && applyModal) {
+        if (serviceTitle) serviceTitle.textContent = ong.nome;
+        if (serviceLocation) serviceLocation.textContent = `${ong.categoria} • Joinville (${ong.bairro}) — ${ong.vagas} vagas disponíveis`;
+        if (serviceDescription) serviceDescription.textContent = ong.descricao;
+        
+        applyModal.classList.add("active");
       }
-    } else {
-      retorno.textContent = 'Não foi possível enviar agora. Tente novamente em instantes.';
     }
-  } finally {
-    botao.disabled = false;
-  }
+  });
+}
+
+// Submeter Inscrição
+if (applyForm) {
+  applyForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    if (applyModal) applyModal.classList.remove("active");
+    if (successModal) successModal.classList.add("active");
+    applyForm.reset();
+  });
+}
+
+if (finishSuccessBtn) {
+  finishSuccessBtn.addEventListener("click", () => {
+    if (successModal) successModal.classList.remove("active");
+  });
+}
+
+// Abertura/Fechamento de Modais
+if (openFilterBtn) openFilterBtn.addEventListener("click", () => filterModal && filterModal.classList.add("active"));
+if (openFilterModalBtn) openFilterModalBtn.addEventListener("click", () => filterModal && filterModal.classList.add("active"));
+if (closeModalBtn) closeModalBtn.addEventListener("click", () => filterModal && filterModal.classList.remove("active"));
+
+if (openProfileBtn) openProfileBtn.addEventListener("click", () => profileModal && profileModal.classList.add("active"));
+if (closeProfileBtn) closeProfileBtn.addEventListener("click", () => profileModal && profileModal.classList.remove("active"));
+if (closeProfileAC) closeProfileAC.addEventListener("click", () => profileModal && profileModal.classList.remove("active"));
+
+if (closeApplyBtn) closeApplyBtn.addEventListener("click", () => applyModal && applyModal.classList.remove("active"));
+
+window.addEventListener("click", (e) => {
+  if (filterModal && e.target === filterModal) filterModal.classList.remove("active");
+  if (profileModal && e.target === profileModal) profileModal.classList.remove("active");
+  if (applyModal && e.target === applyModal) applyModal.classList.remove("active");
+  if (successModal && e.target === successModal) successModal.classList.remove("active");
 });
 
-iniciar().catch(() => {
-  $('#lista').append(criar('li', { className: 'vazio' }, 'Não foi possível carregar as organizações.'));
+categoryButtons.forEach(btn => {
+  btn.addEventListener("click", () => {
+    categoryButtons.forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    selectedCategory = btn.dataset.category;
+  });
 });
+
+if (applyFilterBtn) {
+  applyFilterBtn.addEventListener("click", () => {
+    if (filterModal) filterModal.classList.remove("active");
+    if (selectedCategory !== "Todas") {
+      if (activeFilterBadge) activeFilterBadge.style.display = "inline-flex";
+      if (activeFilterName) activeFilterName.textContent = selectedCategory;
+    } else {
+      if (activeFilterBadge) activeFilterBadge.style.display = "none";
+    }
+    renderONGS();
+  });
+}
+
+if (clearFilterBtn) {
+  clearFilterBtn.addEventListener("click", () => {
+    selectedCategory = "Todas";
+    categoryButtons.forEach(b => {
+      b.classList.toggle("active", b.dataset.category === "Todas");
+    });
+    if (activeFilterBadge) activeFilterBadge.style.display = "none";
+    renderONGS();
+  });
+}
+
+if (searchInput) searchInput.addEventListener("input", renderONGS);
+if (sortSelect) sortSelect.addEventListener("change", renderONGS);
+
+document.addEventListener("DOMContentLoaded", renderONGS);

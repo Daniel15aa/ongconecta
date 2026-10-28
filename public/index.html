@@ -1,79 +1,304 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>OngConecta · voluntariado em Joinville</title>
-  <meta name="description" content="Encontre organizações sociais de Joinville que precisam de voluntários e se inscreva em poucos minutos.">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OngConecta | Plataforma de Voluntariado</title>
+  
+  <!-- Ícones Lucide -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header class="topo">
-    <a class="marca" href="#">Ong<span>Conecta</span></a>
-    <nav aria-label="Principal">
-      <a href="#organizacoes">Organizações</a>
-      <a href="#inscricao">Quero ajudar</a>
+
+  <!-- Top Announcement Bar -->
+  <div class="top-bar">
+    <span>VOLUNTARIADO EM JOINVILLE • Encontre a causa que combina com você</span>
+  </div>
+
+  <!-- Header / Navbar Minimalista -->
+  <header class="navbar">
+    <div class="brand-logo">OngConecta</div>
+    <nav class="nav-links">
+      <a href="#">Organizações</a>
+      <a href="#organizacoes">Projetos</a>
+      <a href="#" id="open-register-ong-nav">+ Cadastrar ONG</a>
     </nav>
+    <div class="nav-actions">
+      <button class="btn-icon" id="open-filter-btn" title="Filtros avançados"><i data-lucide="sliders-horizontal"></i></button>
+      <button class="btn-icon" id="open-profile-btn" title="Meu Perfil / Painel"><i data-lucide="user"></i></button>
+    </div>
   </header>
 
-  <main>
-    <section class="abertura">
-      <p class="selo">Joinville, Santa Catarina</p>
-      <h1>Tem gente querendo ajudar. Tem organização precisando de gente.</h1>
-      <p class="lide">Reunimos num só lugar as entidades da cidade que aceitam voluntários. Escolha uma causa, veja o que elas precisam e faça sua inscrição.</p>
-      <dl class="numeros">
-        <div><dt>Organizações</dt><dd id="num-ongs">–</dd></div>
-        <div><dt>Vagas abertas</dt><dd id="num-vagas">–</dd></div>
-        <div><dt>Áreas de atuação</dt><dd id="num-areas">–</dd></div>
-      </dl>
+  <!-- Hero Section Estilo Nike com contraste reforçado -->
+  <section class="hero-nike">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <span class="hero-tag">JOINVILLE, SANTA CATARINA</span>
+      <h1 class="hero-title">CONECTANDO PROPÓSITOS.</h1>
+      <p class="hero-subtitle">Tem gente querendo ajudar. Tem organização precisando de gente.</p>
+      <div class="hero-buttons">
+        <a href="#organizacoes" class="btn-pill-primary">Quero Ajudar</a>
+        <a href="#" class="btn-pill-secondary" id="open-register-ong-hero">Cadastrar minha ONG</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Conteúdo Principal -->
+  <main class="main-container" id="organizacoes">
+    
+    <!-- Estatísticas em Faixa -->
+    <div class="stats-bar">
+      <div class="stat-item">
+        <span class="stat-number" id="total-orgs">6</span>
+        <span class="stat-label">ORGANIZAÇÕES</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number" id="total-vagas">36</span>
+        <span class="stat-label">VAGAS ABERTAS</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">6</span>
+        <span class="stat-label">ÁREAS DE ATUAÇÃO</span>
+      </div>
+    </div>
+
+    <!-- Listagem de Organizações -->
+    <section class="section-ongs">
+      <div class="section-header">
+        <h2>Organizações em Destaque</h2>
+        <button class="btn-filter-trigger" id="open-filter-modal-btn">
+          <i data-lucide="filter"></i> Filtros e Bairros
+        </button>
+      </div>
+      
+      <!-- Campo de Busca em Tempo Real -->
+      <div class="search-box">
+        <i data-lucide="search" class="search-icon"></i>
+        <input type="text" id="search-input" class="search-input" placeholder="Buscar por nome da ONG, causa ou bairro...">
+      </div>
+
+      <!-- Tag do filtro ativo -->
+      <div id="active-filter-container" class="active-filter-wrapper" style="display: none;">
+        <span id="active-filter-badge" class="active-filter-container">
+          Filtro: <strong id="active-filter-name">Todas</strong>
+        </span>
+        <button id="clear-filter-btn" class="clear-btn">&times; Limpar Filtros</button>
+      </div>
+
+      <!-- Lista de ONGs Renderizada via JS -->
+      <div class="ong-list" id="ong-list"></div>
     </section>
 
-    <section id="organizacoes" class="secao">
-      <div class="secao-topo">
-        <h2>Organizações</h2>
-        <div class="filtros">
-          <label class="busca">
-            <span class="sr">Buscar</span>
-            <input id="busca" type="search" placeholder="Buscar por nome ou tema" autocomplete="off">
-          </label>
-          <div id="areas" class="areas" role="group" aria-label="Filtrar por área"></div>
-        </div>
-      </div>
-      <ul id="lista" class="lista" aria-live="polite"></ul>
-    </section>
-
-    <section id="inscricao" class="secao inscricao">
-      <div>
-        <h2>Quero ajudar</h2>
-        <p>Preencha o formulário e a organização escolhida entra em contato para combinar os próximos passos. Você não assume nenhum compromisso ao se inscrever.</p>
-      </div>
-      <form id="form" novalidate>
-        <label>Organização
-          <select name="ongId" required></select>
-          <small class="erro" data-erro="ongId"></small>
-        </label>
-        <label>Nome completo
-          <input name="nome" type="text" autocomplete="name" required>
-          <small class="erro" data-erro="nome"></small>
-        </label>
-        <label>E-mail
-          <input name="email" type="email" autocomplete="email" required>
-          <small class="erro" data-erro="email"></small>
-        </label>
-        <label>Mensagem <span class="opcional">(opcional)</span>
-          <textarea name="mensagem" rows="4" maxlength="500" placeholder="Conte um pouco sobre sua disponibilidade"></textarea>
-          <small class="erro" data-erro="mensagem"></small>
-        </label>
-        <button type="submit">Enviar inscrição</button>
-        <p id="retorno" class="retorno" role="status"></p>
-      </form>
-    </section>
   </main>
 
-  <footer class="rodape">
-    <p>OngConecta · projeto acadêmico de Engenharia de Software, Católica SC. Os dados exibidos são fictícios.</p>
+  <!-- Modal de Filtros (Categoria + Bairro + Ordenação) -->
+  <div class="modal-overlay" id="filter-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Filtrar Oportunidades</h3>
+        <button class="modal-close" id="close-modal-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-description">Filtrar por Categoria:</p>
+        <div class="category-grid" id="category-options">
+          <button class="category-btn active" data-category="Todas">Todas</button>
+          <button class="category-btn" data-category="Educação">Educação</button>
+          <button class="category-btn" data-category="Animais">Animais</button>
+          <button class="category-btn" data-category="Meio Ambiente">Meio Ambiente</button>
+          <button class="category-btn" data-category="Assistência Social">Assistência Social</button>
+          <button class="category-btn" data-category="Cultura">Cultura</button>
+          <button class="category-btn" data-category="Saúde">Saúde</button>
+        </div>
+
+        <div style="margin-top: 1.25rem;">
+          <label style="font-size: 0.85rem; font-weight: 700; display: block; margin-bottom: 0.4rem;">Filtrar por Bairro em Joinville:</label>
+          <select id="bairro-select" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); background: #ffffff;">
+            <option value="Todos">Todos os Bairros</option>
+            <option value="Centro">Centro</option>
+            <option value="Boa Vista">Boa Vista</option>
+            <option value="Costa e Silva">Costa e Silva</option>
+            <option value="Pirabeiraba">Pirabeiraba</option>
+            <option value="Aventureiro">Aventureiro</option>
+            <option value="Vila Nova">Vila Nova</option>
+          </select>
+        </div>
+        
+        <div style="margin-top: 1.25rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+          <label style="font-size: 0.85rem; font-weight: 700; display: block; margin-bottom: 0.4rem;">Ordenar por:</label>
+          <select id="sort-select" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); background: #ffffff;">
+            <option value="mais-vagas">Mais Vagas Abertas</option>
+            <option value="alfabetica">Nome (A-Z)</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer" style="margin-top: 1.5rem;">
+        <button class="btn-pill-primary" id="apply-filter-btn" style="width: 100%;">Aplicar Filtros</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Perfil (Com Aba de Favoritos) -->
+  <div class="modal-overlay" id="profile-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Painel do Voluntário</h3>
+        <button class="modal-close" id="close-profile-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="text-align: center; margin-bottom: 1.5rem;">
+          <div style="width: 60px; height: 60px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; margin: 0 auto 0.75rem auto;">DT</div>
+          <h4 style="font-size: 1.1rem; font-weight: 700;">Daniel Trindade</h4>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">Voluntário Ativo em Joinville</p>
+        </div>
+        <div style="background: #f8fafc; padding: 1rem; border-radius: 12px; margin-bottom: 1rem; border: 1px solid var(--border-color);">
+          <p style="font-size: 0.85rem; font-weight: 700; margin-bottom: 0.5rem;">Suas ONGs Favoritas (❤️):</p>
+          <div id="favorites-list" style="font-size: 0.85rem; color: var(--text-muted); max-height: 120px; overflow-y: auto;">
+            Nenhuma ONG favoritada ainda.
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-pill-primary" id="close-profile-action" style="width: 100%;">Fechar Painel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Cadastrar Nova ONG -->
+  <div class="modal-overlay" id="register-ong-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Cadastrar Nova Organização</h3>
+        <button class="modal-close" id="close-register-ong-btn">&times;</button>
+      </div>
+      <form id="register-ong-form">
+        <div class="modal-body" style="padding: 0;">
+          <p class="modal-description">Insira os dados da organização de Joinville para publicação imediata:</p>
+          
+          <div style="margin-bottom: 0.9rem;">
+            <label style="font-size: 0.85rem; font-weight: 600; display: block; margin-bottom: 0.3rem;">Nome da ONG / Projeto</label>
+            <input type="text" id="new-ong-name" required class="search-input" style="padding: 0.65rem 1rem;" placeholder="Ex: Amigos do Bem Joinville">
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.9rem;">
+            <div>
+              <label style="font-size: 0.85rem; font-weight: 600; display: block; margin-bottom: 0.3rem;">Categoria</label>
+              <select id="new-ong-category" class="search-input" style="padding: 0.65rem; height: 42px;">
+                <option value="Educação">Educação</option>
+                <option value="Animais">Animais</option>
+                <option value="Meio Ambiente">Meio Ambiente</option>
+                <option value="Assistência Social">Assistência Social</option>
+                <option value="Cultura">Cultura</option>
+                <option value="Saúde">Saúde</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size: 0.85rem; font-weight: 600; display: block; margin-bottom: 0.3rem;">Bairro</label>
+              <input type="text" id="new-ong-bairro" required class="search-input" style="padding: 0.65rem 1rem;" placeholder="Ex: Saguaçu">
+            </div>
+          </div>
+
+          <div style="margin-bottom: 0.9rem;">
+            <label style="font-size: 0.85rem; font-weight: 600; display: block; margin-bottom: 0.3rem;">Vagas Disponíveis</label>
+            <input type="number" id="new-ong-vagas" required min="1" value="5" class="search-input" style="padding: 0.65rem 1rem;">
+          </div>
+
+          <div style="margin-bottom: 0.9rem;">
+            <label style="font-size: 0.85rem; font-weight: 600; display: block; margin-bottom: 0.3rem;">Descrição do Projeto</label>
+            <textarea id="new-ong-desc" required class="search-input" style="padding: 0.65rem 1rem; height: 75px; resize: none;" placeholder="Breve resumo da atividade voluntária..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer" style="margin-top: 1rem;">
+          <button type="submit" class="btn-pill-primary" style="width: 100%;">Publicar Organização</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal de Inscrição (Com Detalhes do Serviço) -->
+  <div class="modal-overlay" id="apply-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="apply-modal-title">Candidatar-se à Vaga</h3>
+        <button class="modal-close" id="close-apply-btn">&times;</button>
+      </div>
+      
+      <div class="service-details-box">
+        <h4 id="service-title">Nome da ONG</h4>
+        <p id="service-location" style="font-weight: 600; color: var(--primary); margin-bottom: 0.4rem; font-size: 0.8rem;"></p>
+        <p id="service-description"></p>
+      </div>
+
+      <form id="apply-form">
+        <div class="modal-body" style="padding: 0;">
+          <p class="modal-description">Insira seus dados abaixo para confirmar seu interesse:</p>
+          
+          <div style="margin-bottom: 0.9rem;">
+            <label style="font-size: 0.85rem; font-weight: 600; display: block; margin-bottom: 0.3rem;">Nome Completo</label>
+            <input type="text" id="volunteer-name" required class="search-input" style="padding: 0.65rem 1rem;" placeholder="Seu nome completo">
+          </div>
+
+          <div style="margin-bottom: 0.9rem;">
+            <label style="font-size: 0.85rem; font-weight: 600; display: block; margin-bottom: 0.3rem;">E-mail</label>
+            <input type="email" id="volunteer-email" required class="search-input" style="padding: 0.65rem 1rem;" placeholder="seu.email@exemplo.com">
+          </div>
+
+          <div style="margin-bottom: 0.9rem;">
+            <label style="font-size: 0.85rem; font-weight: 600; display: block; margin-bottom: 0.3rem;">Telefone / WhatsApp</label>
+            <input type="text" id="volunteer-phone" required class="search-input" style="padding: 0.65rem 1rem;" placeholder="(47) 99999-9999">
+          </div>
+        </div>
+        <div class="modal-footer" style="margin-top: 1rem;">
+          <button type="submit" class="btn-pill-primary" style="width: 100%;">Confirmar Inscrição</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal de Confirmação de Cadastro -->
+  <div class="modal-overlay" id="success-modal">
+    <div class="modal-card" style="text-align: center; padding: 2.5rem 2rem;">
+      <div style="width: 64px; height: 64px; background: #e6f4ea; color: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 1.2rem auto;">✓</div>
+      <h3 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 0.75rem;">Cadastro Confirmado!</h3>
+      <p style="font-size: 0.95rem; color: var(--text-muted); margin-bottom: 1.5rem;">Sua inscrição foi registrada com sucesso dentro do <strong>OngConecta</strong>. A organização entrará em contato em breve.</p>
+      <button class="btn-pill-primary" id="finish-success-btn" style="width: 100%;">Concluir</button>
+    </div>
+  </div>
+
+  <!-- Rodapé (Footer) -->
+  <footer class="footer" id="sobre">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <span class="brand-logo" style="color: #ffffff;">OngConecta</span>
+        <p>Aproximando voluntários e organizações da cidade de Joinville para transformar a comunidade local.</p>
+      </div>
+      <div class="footer-links">
+        <h4>Navegação</h4>
+        <ul>
+          <li><a href="#">Início</a></li>
+          <li><a href="#organizacoes">Organizações</a></li>
+          <li><a href="#" id="open-register-ong-footer">Cadastrar ONG</a></li>
+        </ul>
+      </div>
+      <div class="footer-links">
+        <h4>Contato & Suporte</h4>
+        <ul>
+          <li><a href="#">Joinville, SC - Brasil</a></li>
+          <li><a href="#">contato@ongconecta.org</a></li>
+          <li><a href="#">Termos de Uso</a></li>
+          <li><a href="#">Privacidade</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 OngConecta. Todos os direitos reservados.</p>
+    </div>
   </footer>
 
   <script src="app.js"></script>
+  <script>
+    lucide.createIcons();
+  </script>
 </body>
 </html>
