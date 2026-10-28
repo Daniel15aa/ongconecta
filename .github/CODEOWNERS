@@ -1,0 +1,4 @@
+# Substitua pelos usuários reais do GitHub
+*                @SEU_USUARIO
+/.github/        @SEU_USUARIO @USUARIO_DO_PAR
+/docs/           @SEU_USUARIO @USUARIO_DO_PAR

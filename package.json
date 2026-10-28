@@ -1,0 +1,14 @@
+{
+  "name": "ongconecta",
+  "version": "0.2.0",
+  "description": "Plataforma de voluntariado que conecta pessoas a organizações sociais de Joinville",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --test"
+  },
+  "engines": { "node": ">=18" },
+  "dependencies": { "express": "^4.19.2" },
+  "license": "MIT"
+}

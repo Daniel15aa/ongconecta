@@ -1,0 +1,16 @@
+name: Deploy
+on:
+  push:
+    branches: [main]
+jobs:
+  staging:
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - run: echo "Deploy simulado para STAGING (commit ${{ github.sha }})"
+  production:
+    needs: staging
+    runs-on: ubuntu-latest
+    environment: production   # exige revisor obrigatório (professor)
+    steps:
+      - run: echo "Deploy simulado para PRODUCTION (commit ${{ github.sha }})"

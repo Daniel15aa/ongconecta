@@ -1,0 +1,116 @@
+:root {
+  --papel: #f5f1e8;
+  --papel-escuro: #ebe5d6;
+  --tinta: #1d2a22;
+  --suave: #55625a;
+  --verde: #2f5d46;
+  --terra: #b5502b;
+  --linha: #d6cfbd;
+  --serifa: Georgia, "Iowan Old Style", "Times New Roman", serif;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--papel);
+  color: var(--tinta);
+  font: 17px/1.6 var(--sans);
+}
+a { color: inherit; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+.topo, .abertura, .secao, .rodape {
+  width: min(1080px, 100% - 3rem);
+  margin-inline: auto;
+}
+
+.topo {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding: 1.5rem 0; border-bottom: 1px solid var(--linha);
+}
+.marca { font: 700 1.4rem var(--serifa); text-decoration: none; letter-spacing: -0.01em; }
+.marca span { color: var(--terra); }
+.topo nav { display: flex; gap: 1.75rem; font-size: 0.95rem; }
+.topo nav a { text-decoration: none; color: var(--suave); }
+.topo nav a:hover { color: var(--tinta); }
+
+.abertura { padding: 5rem 0 4rem; max-width: 820px; margin-left: max(1.5rem, calc((100% - 1080px) / 2)); }
+.selo { margin: 0 0 1.25rem; font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--terra); }
+h1 { margin: 0 0 1.5rem; font: 400 clamp(2.2rem, 5vw, 3.6rem)/1.1 var(--serifa); letter-spacing: -0.02em; }
+.lide { margin: 0 0 2.5rem; font-size: 1.15rem; color: var(--suave); max-width: 620px; }
+
+.numeros { display: flex; gap: 3rem; margin: 0; flex-wrap: wrap; }
+.numeros dt { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--suave); }
+.numeros dd { margin: 0; font: 400 2.4rem/1.2 var(--serifa); color: var(--verde); }
+
+.secao { padding: 3.5rem 0; border-top: 1px solid var(--linha); }
+.secao-topo { display: grid; grid-template-columns: 1fr 2fr; gap: 2rem; align-items: start; margin-bottom: 2rem; }
+h2 { margin: 0; font: 400 1.9rem/1.2 var(--serifa); }
+
+.filtros { display: grid; gap: 1rem; }
+.busca input {
+  width: 100%; padding: 0.65rem 0.9rem; font: inherit;
+  background: #fff; border: 1px solid var(--linha); border-radius: 3px;
+}
+.areas { display: flex; flex-wrap: wrap; gap: 0.4rem 1.1rem; }
+.areas button {
+  padding: 0.15rem 0; font: inherit; font-size: 0.95rem; color: var(--suave);
+  background: none; border: 0; border-bottom: 2px solid transparent; cursor: pointer;
+}
+.areas button:hover { color: var(--tinta); }
+.areas button[aria-pressed="true"] { color: var(--verde); border-bottom-color: var(--verde); font-weight: 600; }
+
+.lista { list-style: none; margin: 0; padding: 0; }
+.ong {
+  display: grid; grid-template-columns: 1fr 2fr auto; gap: 2rem; align-items: start;
+  padding: 1.75rem 0; border-top: 1px solid var(--linha);
+}
+.ong:last-child { border-bottom: 1px solid var(--linha); }
+.ong h3 { margin: 0 0 0.25rem; font: 700 1.25rem var(--serifa); }
+.ong .meta { margin: 0; font-size: 0.88rem; color: var(--suave); }
+.ong p { margin: 0; }
+.ong .acao { text-align: right; }
+.ong .vagas { display: block; margin-bottom: 0.6rem; font-size: 0.88rem; color: var(--terra); font-weight: 600; }
+.vazio { padding: 2rem 0; color: var(--suave); }
+
+button.link, form button {
+  font: inherit; cursor: pointer; border-radius: 3px;
+}
+button.link {
+  padding: 0.45rem 0.9rem; background: none; color: var(--verde);
+  border: 1px solid var(--verde);
+}
+button.link:hover { background: var(--verde); color: #fff; }
+
+.inscricao { display: grid; grid-template-columns: 1fr 1.4fr; gap: 3rem; }
+.inscricao p { color: var(--suave); }
+form { display: grid; gap: 1.1rem; }
+form label { display: grid; gap: 0.3rem; font-size: 0.92rem; font-weight: 600; }
+.opcional { font-weight: 400; color: var(--suave); }
+input, select, textarea {
+  padding: 0.65rem 0.8rem; font: inherit; font-weight: 400; color: var(--tinta);
+  background: #fff; border: 1px solid var(--linha); border-radius: 3px;
+}
+input:focus, select:focus, textarea:focus, .areas button:focus-visible, button:focus-visible {
+  outline: 2px solid var(--verde); outline-offset: 2px;
+}
+.erro { min-height: 1em; color: var(--terra); font-weight: 400; }
+form button {
+  justify-self: start; padding: 0.75rem 1.6rem; color: #fff;
+  background: var(--verde); border: 0;
+}
+form button:hover { background: #244a37; }
+form button:disabled { opacity: 0.6; cursor: wait; }
+.retorno { margin: 0; font-weight: 600; color: var(--verde); }
+
+.rodape { padding: 2rem 0 3rem; border-top: 1px solid var(--linha); font-size: 0.85rem; color: var(--suave); }
+
+@media (max-width: 760px) {
+  .secao-topo, .inscricao { grid-template-columns: 1fr; gap: 1.5rem; }
+  .ong { grid-template-columns: 1fr; gap: 0.75rem; }
+  .ong .acao { text-align: left; }
+  .abertura { padding: 3rem 0 2.5rem; margin-left: auto; }
+  .numeros { gap: 2rem; }
+}
